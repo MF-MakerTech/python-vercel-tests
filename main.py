@@ -1,16 +1,22 @@
 """FastAPI app for Vercel with AI Gateway."""
 
-import os
 import logging
+import os
+import time
 from datetime import UTC, datetime
 
 from fastapi import FastAPI, Header, HTTPException
 from openai import OpenAI
 from pydantic import BaseModel, Field
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 AI_GATEWAY_BASE_URL = "https://ai-gateway.vercel.sh/v1"
 DEFAULT_MODEL = "openai/gpt-4o-mini"
 DEFAULT_CRON_QUESTION = "Give me a one-sentence tip about FastAPI."
+CRON_TEST_DURATION_SECONDS = 5 * 60
+CRON_TEST_LOG_INTERVAL_SECONDS = 10
 
 app = FastAPI(
     title="Python Vercel Test",
@@ -55,6 +61,26 @@ def _verify_cron_auth(authorization: str | None) -> None:
         return
     if authorization != f"Bearer {cron_secret}":
         raise HTTPException(status_code=401, detail="Unauthorized")
+
+
+def _run_duration_test() -> int:
+    """Run a timed loop for cron duration experiments.
+
+    Logs elapsed time every 10 seconds for 5 minutes.
+
+    Returns:
+        Total elapsed seconds when the test completes.
+    """
+    start = time.monotonic()
+
+    while True:
+        elapsed = int(time.monotonic() - start)
+        logger.info("Cron job running for %s seconds", elapsed)
+        if elapsed >= CRON_TEST_DURATION_SECONDS:
+            break
+        time.sleep(CRON_TEST_LOG_INTERVAL_SECONDS)
+
+    return elapsed
 
 
 def _ask_ai(question: str, model: str | None = None) -> tuple[str, str]:
@@ -167,16 +193,17 @@ def cron_job(
     Raises:
         HTTPException: If the request is unauthorized.
     """
-    logging.info("Cron job started")
     _verify_cron_auth(authorization)
-    logging.info("Cron job done")
-    
+    elapsed_seconds = _run_duration_test()
+    logger.info("Cron job finished after %s seconds", elapsed_seconds)
+
     return CronResponse(
         status="ok",
         ran_at=datetime.now(tz=UTC).isoformat(),
-        message="Hello, world!",
+        message=f"Duration test completed in {elapsed_seconds} seconds",
         schedule=x_vercel_cron_schedule,
     )
+
 
 def main() -> None:
     """Run the FastAPI app locally with uvicorn."""
