@@ -1,0 +1,7 @@
+Metadata-Version: 2.4
+Name: python-vercel-tests
+Version: 0.1.0
+Summary: FastAPI test app for Vercel with AI Gateway
+Requires-Python: >=3.12
+Requires-Dist: fastapi[standard]>=0.115.0
+Requires-Dist: openai>=1.0.0

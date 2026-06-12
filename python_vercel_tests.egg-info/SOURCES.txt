@@ -1,0 +1,8 @@
+README.md
+main.py
+pyproject.toml
+python_vercel_tests.egg-info/PKG-INFO
+python_vercel_tests.egg-info/SOURCES.txt
+python_vercel_tests.egg-info/dependency_links.txt
+python_vercel_tests.egg-info/requires.txt
+python_vercel_tests.egg-info/top_level.txt

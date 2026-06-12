@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "python-vercel-tests"
+version = "0.1.0"
+description = "FastAPI test app for Vercel with AI Gateway"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]>=0.115.0",
+    "openai>=1.0.0",
+]
+
+[tool.ruff]
+line-length = 79
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "D"]
+ignore = ["D104"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.pyright]
+pythonVersion = "3.12"
+typeCheckingMode = "basic"
