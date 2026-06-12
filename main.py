@@ -168,8 +168,12 @@ def ask(body: QuestionRequest) -> QuestionResponse:
     Raises:
         HTTPException: On auth or upstream API errors.
     """
-    model = body.model or os.getenv("AI_MODEL", DEFAULT_MODEL)
-    answer, used_model = _ask_ai(body.question, model)
+    # model = body.model or os.getenv("AI_MODEL", DEFAULT_MODEL)
+    # answer, used_model = _ask_ai(body.question, model)
+
+    answer = "Hello, world!"
+    used_model = "openai/gpt-4o-mini"
+    
     return QuestionResponse(answer=answer, model=used_model)
 
 
