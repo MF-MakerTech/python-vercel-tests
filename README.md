@@ -5,10 +5,11 @@ through the [Vercel AI Gateway](https://vercel.com/docs/ai-gateway).
 
 ## Endpoints
 
-| Method | Path  | Description              |
-| ------ | ----- | ------------------------ |
-| GET    | `/`   | Health check             |
-| POST   | `/ask` | Ask a question via AI Gateway |
+| Method | Path   | Description                              |
+| ------ | ------ | ---------------------------------------- |
+| GET    | `/`    | Health check                             |
+| POST   | `/ask` | Ask a question via AI Gateway            |
+| GET    | `/cron` | Scheduled job (Vercel Cron, daily 9 UTC) |
 
 ### Example request
 
@@ -57,6 +58,36 @@ Optional fields on `/ask`:
 
    Open http://localhost:8000/docs for the interactive API explorer.
 
+## Cron job
+
+The project includes a [Vercel Cron Job](https://vercel.com/docs/cron-jobs) that
+hits `GET /cron` every day at 9:00 UTC. The schedule is defined in
+`vercel.json`:
+
+```json
+{
+  "crons": [
+    {
+      "path": "/cron",
+      "schedule": "0 9 * * *"
+    }
+  ]
+}
+```
+
+Each run asks the AI Gateway a question (default from `CRON_QUESTION`) and
+returns the answer. Set `CRON_SECRET` in Vercel — Vercel sends it as a
+`Bearer` token so only scheduled invocations succeed.
+
+Test locally:
+
+```bash
+curl http://localhost:8000/cron \
+  -H "Authorization: Bearer your_random_cron_secret"
+```
+
+Cron jobs only run on **production** deployments, not preview deploys.
+
 ## Deploy to Vercel
 
 1. Install the [Vercel CLI](https://vercel.com/docs/cli) and log in:
@@ -79,6 +110,8 @@ Optional fields on `/ask`:
    ```bash
    vercel env add AI_GATEWAY_API_KEY
    vercel env add AI_MODEL
+   vercel env add CRON_SECRET
+   vercel env add CRON_QUESTION
    ```
 
    On Vercel deployments, OIDC auth (`VERCEL_OIDC_TOKEN`) is also available
